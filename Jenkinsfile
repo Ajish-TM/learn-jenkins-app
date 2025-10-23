@@ -20,5 +20,8 @@ pipeline {
                 '''
             }
         }
+        stage('Test') {
+            sh 'touch build/index.html'
+        }
     }
 }
