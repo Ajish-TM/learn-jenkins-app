@@ -84,13 +84,22 @@ pipeline {
                 }
             }
             steps {
-                sh '''
+                          sh '''
+                    echo "🚀 Installing Netlify CLI..."
                     npm install netlify-cli
+
+                    echo "🔍 Checking Netlify CLI version..."
                     node_modules/.bin/netlify --version
-                    echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
-                    node_modules/.bin/netlify status
-                    node_modules/.bin/netlify deploy --auth $NETLIFY_AUTH_TOKEN --prod --dir=build --skip-build
+
+                    echo "🌐 Deploying to production. Site ID: $NETLIFY_SITE_ID"
+                    node_modules/.bin/netlify status --auth $NETLIFY_AUTH_TOKEN || echo "⚠️  Skipping status check (not authenticated session)"
+
+                    echo "📤 Uploading build directory to Netlify..."
+                    node_modules/.bin/netlify deploy --auth $NETLIFY_AUTH_TOKEN --prod --dir=build --message "CI Deploy via Jenkins"
+
+                    echo "✅ Deployment complete."
                 '''
+
             }
         }
     }
