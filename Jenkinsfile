@@ -94,10 +94,11 @@ pipeline {
                     echo "🌐 Deploying to production. Site ID: $NETLIFY_SITE_ID"
                     node_modules/.bin/netlify status --auth $NETLIFY_AUTH_TOKEN || echo "⚠️  Skipping status check (not authenticated session)"
 
-                    echo "📤 Uploading build directory to Netlify..."
-                    node_modules/.bin/netlify deploy --auth $NETLIFY_AUTH_TOKEN --prod --dir=build --message "CI Deploy via Jenkins"
+                   
+            echo "🌐 Deploying pre-built files to Netlify..."
+            node_modules/.bin/netlify deploy --auth $NETLIFY_AUTH_TOKEN --prod --dir=build --no-build --message "CI Deploy via Jenkins"
 
-                    echo "✅ Deployment complete."
+            echo "✅ Deployment complete."
                 '''
 
             }
