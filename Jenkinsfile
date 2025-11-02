@@ -17,6 +17,7 @@ pipeline {
             }
             steps {
                 sh '''
+                echo "✅ Deployment begin."
                     ls -la
                     node --version
                     npm --version
