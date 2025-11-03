@@ -124,7 +124,7 @@ pipeline {
                     netlify --version
                     echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
                     netlify status
-                    netlify deploy --dir=build --prod
+            node_modules/.bin/netlify deploy --auth $NETLIFY_AUTH_TOKEN --prod --dir=build --no-build --message "CI Deploy via Jenkins"
                     npx playwright test  --reporter=html
                 '''
             }
