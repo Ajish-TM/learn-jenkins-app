@@ -7,7 +7,27 @@ pipeline {
         REACT_APP_VERSION = "1.0.$BUILD_ID"
     }
 
-    stages {
+   stages {
+
+        stage('AWS') {
+            agent {
+                docker {
+                    image 'amazon/aws-cli'
+                    args "--entrypoint=''"
+                }
+            }
+            environment {
+                AWS_S3_BUCKET = 'learn-jenkin-03112025'
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'my-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+                    sh '''
+                        aws --version
+                        aws s3 sync build s3://$AWS_S3_BUCKET
+                    '''
+                }
+            }
+        }
 
         stage('Build') {
             agent {
@@ -25,27 +45,6 @@ pipeline {
                     npm run build
                     ls -la
                 '''
-            }
-        }
-
-        stage('AWS') {
-            agent {
-                docker {
-                    image 'amazon/aws-cli'
-                    reuseNode true
-                    args "--entrypoint=''"
-                }
-            }
-            environment {
-                AWS_S3_BUCKET = 'your-aws-s3-bucket-name'
-            }
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'my-aws', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
-                    sh '''
-                        aws --version
-                        aws s3 sync build s3://$AWS_S3_BUCKET
-                    '''
-                }
             }
         }
 
@@ -136,7 +135,7 @@ pipeline {
             }
 
             environment {
-                CI_ENVIRONMENT_URL = 'YOUR NETLIFY SITE URL'
+                CI_ENVIRONMENT_URL = 'YOUR NETLIFY URL'
             }
 
             steps {
@@ -145,7 +144,7 @@ pipeline {
                     netlify --version
                     echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
                     netlify status
-                    netlify deploy --dir=build --prod
+            node_modules/.bin/netlify deploy --auth $NETLIFY_AUTH_TOKEN --prod --dir=build --no-build --message "CI Deploy via Jenkins"
                     npx playwright test  --reporter=html
                 '''
             }
@@ -157,4 +156,5 @@ pipeline {
             }
         }
     }
+
 }
