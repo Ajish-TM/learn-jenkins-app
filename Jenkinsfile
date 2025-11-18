@@ -50,18 +50,23 @@ pipeline {
 
        
 
-         stage('Build Docker image') {
+       stage('Build Docker image') {
             agent {
                 docker {
-                    image 'amazon/aws-cli'
+                    // ⬇️ *** CHANGE THIS LINE ***
+                    image 'docker:24' // Use an image that has the Docker client
                     reuseNode true
-                    args "-u root -v /var/run/docker.sock:/var/run/docker.sock --entrypoint=''"
+                    // Keep these args to mount the socket
+                    args "-u root -v /var/run/docker.sock:/var/run/docker.sock --entrypoint=''" 
                 }
             }
 
             steps {
                 sh '''
-                    amazon-linux-extras install docker
+                    # ⬇️ *** REMOVE THIS LINE ***
+                    # amazon-linux-extras install docker (This is not needed)
+                    
+                    # ⬇️ *** THIS LINE WILL NOW WORK ***
                     docker build -t myjenkinsapp .
                 '''
             }
